@@ -44,12 +44,13 @@ class Game(object):
 
     def game_over(self):
         """Whether the game is over."""
+        if self.max_tile() >= 2048:             # stop at winning state
+            return True
 
         for action in range(4):
             if self.is_action_available(action):
                 return False
         return True
-    
 
     def available_actions(self):
         """Computes the set of actions that are available."""
@@ -145,10 +146,12 @@ class Game(object):
                 return '% 5d' % (2 ** value,)
             return "     "
 
+        print("=" * 50)
         print("-" * 25)
         for row in range(4):
             print("|" + "|".join([tile_string(v) for v in self._state[row, :]]) + "|")
             print("-" * 25)
+        print("=" * 50)
 
     def state(self):
         """Return current state."""
@@ -157,19 +160,19 @@ class Game(object):
     def score(self):
         """Return current score."""
         return self._score
-    
+
     def vector(self):
         vec = torch.zeros(256)
         for i, num in enumerate(np.array(self._state).flatten()):
-            vec[i*16 + num-1] = 1
+            vec[i * 16 + num - 1] = 1
         return vec
-    
+
     def action_available(self):
         return np.array([self.is_action_available(action) for action in range(4)])
-    
+
     def max_tile(self):
-        return 2**np.max(self._state)
-    
+        return 2 ** np.max(self._state)
+
     def get_next_state(self, action):
         new_state = self._state.copy()
         temp_state = np.rot90(new_state, action)
@@ -177,34 +180,36 @@ class Game(object):
         new_state = np.rot90(temp_state, -action)
         vec = torch.zeros(256)
         for i, num in enumerate(np.array(new_state).flatten()):
-            vec[i*16 + num-1] = 1
+            vec[i * 16 + num - 1] = 1
         if not self.is_action_available(action):
             return new_state, vec, 0
         return new_state, vec, reward
-    
+
     def inbound(self, c):
-            return c[0] >= 0 and c[0] < 4 and c[1] >= 0 and c[1] < 4
-    
+        return 0 <= c[0] < 4 and 0 <= c[1] < 4
+
     def findFarthestPosition(self, cell, vector):
         while True:
             previous = cell
             cell = (cell[0] + vector[0], cell[1] + vector[1])
-            if not self.inbound(cell) or self._state[cell[0], cell[1]] != 0: break
+            if not self.inbound(cell) or self._state[cell[0], cell[1]] != 0:
+                break
         return previous, cell
-    
+
     def smoothness(self):
-        vectors =   {0: (0, -1), 1: (1, 0), 2: (0, 1), 3: (-1, 0)}
+        vectors = {0: (0, -1), 1: (1, 0), 2: (0, 1), 3: (-1, 0)}
         smoothness = 0
         for x in range(4):
             for y in range(4):
-                value = self._state[x,y]
-                for d in {1,2}:
+                value = self._state[x, y]
+                for d in [0, 1, 2, 3]:
                     v = vectors[d]
-                    targetCell = self.findFarthestPosition((x,y), v)[1]
+                    targetCell = self.findFarthestPosition((x, y), v)[1]
                     target = self._state[targetCell[0], targetCell[1]] if self.inbound(targetCell) else 0
-                    if target != 0: smoothness -= abs(value - target)
+                    if target != 0:
+                        smoothness -= abs(value - target)
         return smoothness
-    
+
     def monotonicity(self):
         totals = [0, 0, 0, 0]
         for x in range(4):
@@ -221,7 +226,7 @@ class Game(object):
                     totals[1] += cur_value - next_value
                 current = n
                 n += 1
-                
+
         for y in range(4):
             current = 0
             n = current + 1
@@ -237,12 +242,13 @@ class Game(object):
                 current = n
                 n += 1
         return max(totals[0], totals[1]) + max(totals[2], totals[3])
-    
+
     def eval(self):
         emptyCells = np.sum(self._state == 0)
         emptyCellScore = math.log(emptyCells) if emptyCells > 0 else 0
         smoothWeight = 0.1
-        monoWeight  = 1.0
-        emptyWeight  = 2.7
-        maxWeight    = 1.0  
-        return self.smoothness() * smoothWeight + self.monotonicity() * monoWeight + emptyCellScore * emptyWeight + np.max(self._state) * maxWeight
+        monoWeight = 1.0
+        emptyWeight = 2.7
+        maxWeight = 1.0
+        return self.smoothness() * smoothWeight + self.monotonicity() * monoWeight + emptyCellScore * emptyWeight + np.max(
+            self._state) * maxWeight

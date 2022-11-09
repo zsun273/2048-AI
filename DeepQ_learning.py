@@ -13,6 +13,7 @@ import torch.nn as nn
 import torch
 import torch.optim as optim
 
+
 class Net(nn.Module):
     def __init__(self, hidden_dim, drop_out):
         super().__init__()
@@ -22,9 +23,11 @@ class Net(nn.Module):
             nn.Dropout(drop_out),
             nn.Linear(hidden_dim, 4)
         )
+
     def forward(self, x):
         x = x.to(device)
         return self.fc(x)
+
 
 def play_game(test_game):
     while True:
@@ -34,19 +37,23 @@ def play_game(test_game):
             x = int(input("action: "))
         except:
             continue
-        if x == -1: break
+        if x == -1:
+            break
         test_game.do_action(x)
-    
+
+
 def random_play(test_game):
     while not test_game.game_over():
         action = random.choice(test_game.available_actions())
         test_game.do_action(action)
     return test_game.score()
-    
+
+
 def train_game(game, it):
     global losses
     batch_label, batch_output = [], []
     step = 1
+    steps_to_2048 = 0
     while True:
         Q_values = model(game.vector())
         Q_valid_values = [Q_values[a] if game.is_action_available(a) else float('-inf') for a in range(4)]
@@ -57,7 +64,7 @@ def train_game(game, it):
             new_state, vec, reward = game.get_next_state(best_action)
         except:
             print(new_state, vec, reward)
-#            sys.exit(0)
+        #            sys.exit(0)
         with torch.no_grad():
             Q_next = model(vec)
         batch_output.append(Q_star)
@@ -71,26 +78,35 @@ def train_game(game, it):
             loss = criterion(output_tensor, label_tensor)
             loss.backward()
             optimizer.step()
-#            print(loss.item())
+            #            print(loss.item())
             losses.append(loss.item())
             if game.game_over():
-                print("epoch: {}, game score: {}".format(it, game.score()))
+                print("epoch: {}, game score: {}, max tile: {}, steps taken: {}".format(it, game.score(), game.max_tile(), steps_to_2048))
                 return
         step += 1
-        
+        if game.max_tile() < 2048:
+            steps_to_2048 += 1
+
+
 def eval_game(game):
     global scores
     model.eval()
     with torch.no_grad():
         for i in range(n_eval):
+            steps_to_2048 = 0
             game = Game()
             while not game.game_over():
                 Q_values = model(game.vector())
                 Q_valid_values = [Q_values[a] if game.is_action_available(a) else float('-inf') for a in range(4)]
                 best_action = np.argmax(Q_valid_values)
                 game.do_action(best_action)
-            print("game score: {}".format(game.score()))
+                if game.max_tile() < 2048:
+                    steps_to_2048 += 1
+            # if game.max_tile() < 2048:
+            #     steps_to_2048 = -1
+            print("game score: {}, max tile: {}, steps take: {}".format(game.score(), game.max_tile(), steps_to_2048))
             scores.append(game.score())
+
 
 batch_size = 128
 hidden_dim = 128
@@ -98,7 +114,7 @@ drop_out = 0.2
 n_epoch = 1000
 n_eval = 100
 gamma = 1
-    
+
 SEED = 1234
 random.seed(SEED)
 np.random.seed(SEED)
@@ -117,15 +133,14 @@ losses = []
 scores = []
 randoms = []
 
-if __name__=="__main__":
-#    for i in range(100):
-#        game = Game()
-#        randoms.append(random_play(game))
-#    print("the mean of the score is {}".format(np.mean(randoms)))
+if __name__ == "__main__":
+    #    for i in range(100):
+    #        game = Game()
+    #        randoms.append(random_play(game))
+    #    print("the mean of the score is {}".format(np.mean(randoms)))
     model.train()
     for it in range(n_epoch):
         game = Game()
         train_game(game, it)
     eval_game(game)
     print("the mean of the score is {}".format(np.mean(scores)))
-        
