@@ -3,6 +3,7 @@
 import numpy as np
 import torch
 import math
+from collections import Counter
 
 ACTION_NAMES = ["left", "up", "right", "down"]
 ACTION_LEFT = 0
@@ -44,8 +45,8 @@ class Game(object):
 
     def game_over(self):
         """Whether the game is over."""
-        if self.max_tile() >= 2048:             # stop at winning state
-            return True
+        # if self.max_tile() >= 2048:  # stop at winning state
+        #     return True
 
         for action in range(4):
             if self.is_action_available(action):
@@ -216,7 +217,8 @@ class Game(object):
             current = 0
             n = current + 1
             while n < 4:
-                while n < 4 and self._state[x, n] == 0: n += 1
+                while n < 4 and self._state[x, n] == 0:
+                    n += 1
                 if n >= 4: n -= 1
                 cur_value = self._state[x, current]
                 next_value = self._state[x, n]
@@ -243,6 +245,92 @@ class Game(object):
                 n += 1
         return max(totals[0], totals[1]) + max(totals[2], totals[3])
 
+    def uniformity(self):
+        uniformity = 0
+        values = []
+        for row in range(4):
+            for col in range(4):
+                values.append(self._state[row, col])
+        count = Counter(values)
+
+        for key in count:
+            uniformity += (count[key]) ** 3
+
+        return uniformity
+
+    def number_of_potential_merges(self):
+        merges = 0
+        for row in range(4):
+            for col in range(4):
+                if self.inbound([row, col + 1]):
+                    if self._state[row, col + 1] == self._state[row, col]:
+                        merges += 1
+                if self.inbound([row + 1, col]):
+                    if self._state[row + 1, col] == self._state[row, col]:
+                        merges += 1
+
+        return merges
+
+    def eval_row(self, board, row_index):
+        '''
+        calculate evaluation score for a single row
+        '''
+        row = board[row_index]
+
+        score_lost_penalty = 0
+        score_monotonicity_power = 4
+        score_monotonicity_weight = 47
+        score_sum_power = 3.5
+        score_sum_weight = 0
+        score_merges_weight = 700
+        score_empty_weight = 270
+
+        empty = np.sum(row == 0)
+
+        merges = 0  # number of tiles that can be merged
+        prev = 0
+        counter = 0
+        total = 0  # sum
+        for i in range(4):
+            rank = row[i]
+            total += pow(rank, score_sum_power)
+            if rank != 0:
+                if prev == rank:
+                    counter += 1
+                elif counter > 0:
+                    merges += 1 + counter
+                    counter = 0
+                prev = rank
+
+        if counter > 0:
+            merges += 1 + counter
+
+        monotonicity_left = 20000
+        monotonicity_right = 0
+        for i in range(1, 4):
+            if row[i - 1] > row[i]:
+                monotonicity_left += pow(row[i - 1], score_monotonicity_power) - pow(row[i], score_monotonicity_power)
+            else:
+                monotonicity_right += pow(row[i], score_monotonicity_power) - pow(row[i - 1], score_monotonicity_power)
+
+        # return score_lost_penalty + score_empty_weight * empty + score_merges_weight * merges \
+        #        - score_monotonicity_weight * min(monotonicity_left, monotonicity_right) - score_sum_weight * total
+
+        return score_empty_weight * empty + score_merges_weight * merges
+
+    # def eval(self):
+    #     score = 0
+    #     # add evaluation score for all rows
+    #     for row_index in range(4):
+    #         score += self.eval_row(self._state, row_index)
+    #
+    #     temp_board = np.rot90(self._state, 1)
+    #     # add evaluation score for all columns
+    #     for row_index in range(4):
+    #         score += self.eval_row(temp_board, row_index)
+    #
+    #     return score
+
     def eval(self):
         emptyCells = np.sum(self._state == 0)
         emptyCellScore = math.log(emptyCells) if emptyCells > 0 else 0
@@ -252,3 +340,19 @@ class Game(object):
         maxWeight = 1.0
         return self.smoothness() * smoothWeight + self.monotonicity() * monoWeight + emptyCellScore * emptyWeight + np.max(
             self._state) * maxWeight
+        #return self.number_of_potential_merges() + 0.5 * emptyCells
+
+
+
+
+
+
+# Use single heuristic results:
+# Note: with only monotonicity, 1024 can be reached 8/10, 2048 can be reached 0/10
+#       with only emptyScore,   1024 can be reached 10/10, 2048 can be reached 1/10
+#      *with only # merges,     1024 can be reached 8/10, 2048 can be reached 5/10     -- my code
+#       with only smoothness,   1024 can be reached 1/10, 2048 can be reached 0/10     -- original code
+#       with only max state,    1024 can be reached 0/10, 2048 can be reached 0/10
+
+# Use multiple heuristics:
+#
