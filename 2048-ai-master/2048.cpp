@@ -76,7 +76,10 @@ static row_t row_right_table[65536];
 static board_t col_up_table[65536];
 static board_t col_down_table[65536];
 static float heur_score_table[65536];
+static float heur_score_table2[65536];
 static float score_table[65536];
+
+static bool second_stage = false;
 
 // Heuristic scoring settings
 static const float SCORE_LOST_PENALTY = 200000.0f;
@@ -87,7 +90,13 @@ static const float SCORE_SUM_WEIGHT = 11.0f;
 static const float SCORE_MERGES_WEIGHT = 700.0f;
 static const float SCORE_EMPTY_WEIGHT = 370.0f;
 
-void init_tables() {
+// score_lost_penalty = slp;
+// float score_empty_weight = sew;
+// float score_merges_weight = smw;
+// float score_monotonicity_weight = smw2;
+// float score_sum_weight
+void init_tables(float score_merges_weight=SCORE_MERGES_WEIGHT,float score_lost_penalty= SCORE_LOST_PENALTY,float score_empty_weight = SCORE_EMPTY_WEIGHT,float score_monotonicity_weight =SCORE_MONOTONICITY_WEIGHT,float score_sum_weight= SCORE_SUM_WEIGHT) {
+// void init_tables() {
     for (unsigned row = 0; row < 65536; ++row) {
         unsigned line[4] = {
                 (row >>  0) & 0xf,
@@ -143,12 +152,17 @@ void init_tables() {
                 monotonicity_right += pow(line[i], SCORE_MONOTONICITY_POWER) - pow(line[i-1], SCORE_MONOTONICITY_POWER);
             }
         }
-
         heur_score_table[row] = SCORE_LOST_PENALTY +
             SCORE_EMPTY_WEIGHT * empty +
             SCORE_MERGES_WEIGHT * merges -
             SCORE_MONOTONICITY_WEIGHT * std::min(monotonicity_left, monotonicity_right) -
-            SCORE_SUM_WEIGHT * sum;
+            SCORE_SUM_WEIGHT * sum; 
+
+        heur_score_table2[row] = score_lost_penalty +
+            score_empty_weight * empty +
+            score_merges_weight * merges -
+            score_monotonicity_weight * std::min(monotonicity_left, monotonicity_right) -
+            score_sum_weight * sum;
 
         // execute a move to the left
         for (int i = 0; i < 3; ++i) {
@@ -281,7 +295,7 @@ struct eval_state {
 };
 
 // score a single board heuristically
-static float score_heur_board(board_t board);
+static float score_heur_board(board_t board,bool second_stage);
 // score a single board actually (adding in the score from spawned 4 tiles)
 static float score_board(board_t board);
 // score over all possible moves
@@ -298,12 +312,17 @@ static float score_helper(board_t board, const float* table) {
            10 * (2048 - pow(2, get_max_rank(board)));
 }
 
-static float score_heur_board(board_t board) {
+static float score_heur_board(board_t board,bool second_stage) {
     int bonus = 0;
     if (get_max_rank(board) == 11) {            // when there is a 1024
         bonus = 200000;
+        second_stage = true;
     }
-
+    if(second_stage){
+        return score_helper(          board , heur_score_table2) +
+           score_helper(transpose(board), heur_score_table2)
+           + bonus;
+    }
     return score_helper(          board , heur_score_table) +
            score_helper(transpose(board), heur_score_table)
            + bonus;
@@ -322,7 +341,7 @@ static const int CACHE_DEPTH_LIMIT  = 15;
 static float score_tilechoose_node(eval_state &state, board_t board, float cprob) {
     if (cprob < CPROB_THRESH_BASE || state.curdepth >= state.depth_limit) {
         state.maxdepth = std::max(state.curdepth, state.maxdepth);
-        return score_heur_board(board);
+        return score_heur_board(board,second_stage);
     }
     if (state.curdepth < CACHE_DEPTH_LIMIT) {
         const trans_table_t::iterator &i = state.trans_table.find(board);
@@ -492,7 +511,7 @@ static board_t initial_board() {
     return insert_tile_rand(board, draw_tile());
 }
 
-int play_game(get_move_func_t get_move) {
+int play_game(get_move_func_t get_move,bool second_stage) {
     board_t board = initial_board();
     int moveno = 0;
     int scorepenalty = 0; // "penalty" for obtaining free 4 tiles
@@ -541,17 +560,31 @@ int play_game(get_move_func_t get_move) {
     return moveno;
 }
 
+// static const float SCORE_LOST_PENALTY = 200000.0f;
+// static const float SCORE_MONOTONICITY_WEIGHT = 47.0f;
+// static const float SCORE_SUM_WEIGHT = 11.0f;
+// static const float SCORE_MERGES_WEIGHT = 700.0f;
+// static const float SCORE_EMPTY_WEIGHT = 370.0f;
+
+// increase merge: 700-1000
+// increase monotonicity weight
 int main() {
     int avg_step = 0;
-    int trials = 100;
-    for (int i = 0; i < trials; ++i) {
-        printf("Trial: %d         ", i);
-        init_tables();
-        avg_step = avg_step + play_game(find_best_move);
-        printf("Average step to 2048 was %d.\n", avg_step/(i+1));
+    int trials = 10;
+    for(int j = 790;j <=1000; j=j+30){
+        printf("merge weight: %d         ", j);
+        avg_step = 0;
+        for (int i = 0; i < trials; ++i) {
+            printf("Trial: %d         ", i);
+            init_tables(j);
+            avg_step = avg_step + play_game(find_best_move,second_stage);
+            second_stage = false;
+            printf("Average step to 2048 was %d.\n", avg_step/(i+1));
+        }    
+        avg_step = avg_step / trials;
+        printf("\nAverage step to 2048 was %d.\n", avg_step);
     }
+    
 
-    avg_step = avg_step / trials;
-    printf("\nAverage step to 2048 was %d.\n", avg_step);
 
 }

@@ -2,7 +2,7 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Define to 1 if you have the `arc4random_uniform' function. */
-#define HAVE_ARC4RANDOM_UNIFORM 1
+/* #undef HAVE_ARC4RANDOM_UNIFORM */
 
 /* define if the compiler supports basic C++11 syntax */
 #define HAVE_CXX11 1
@@ -47,7 +47,7 @@
 #define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <tr1/unordered_map> header file. */
-/* #undef HAVE_TR1_UNORDERED_MAP */
+#define HAVE_TR1_UNORDERED_MAP 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1

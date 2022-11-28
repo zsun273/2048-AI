@@ -1,0 +1,159 @@
+# 948 ~ 952
+
+merge weight 700-790
+
+merge weight: 790         Trial: 0         Steps took was 942.
+Average step to 2048 was 942.
+Trial: 1         Steps took was 942.
+Average step to 2048 was 942.
+Trial: 2         Steps took was 958.
+Average step to 2048 was 947.
+Trial: 3         Steps took was 954.
+Average step to 2048 was 949.
+Trial: 4         Steps took was 948.
+Average step to 2048 was 948.
+Trial: 5         Steps took was 950.
+Average step to 2048 was 949.
+Trial: 6         Steps took was 954.
+Average step to 2048 was 949.
+Trial: 7         Steps took was 963.
+Average step to 2048 was 951.
+Trial: 8         Steps took was 961.
+Average step to 2048 was 952.
+Trial: 9         Steps took was 1005.
+Average step to 2048 was 957.
+
+Average step to 2048 was 957.
+merge weight: 820         Trial: 0         Steps took was 954.
+Average step to 2048 was 954.
+Trial: 1         Steps took was 955.
+Average step to 2048 was 954.
+Trial: 2         Steps took was 941.
+Average step to 2048 was 950.
+Trial: 3         Steps took was 944.
+Average step to 2048 was 948.
+Trial: 4         Steps took was 957.
+Average step to 2048 was 950.
+Trial: 5         Steps took was 955.
+Average step to 2048 was 951.
+Trial: 6         Steps took was 945.
+Average step to 2048 was 950.
+Trial: 7         Steps took was 957.
+Average step to 2048 was 951.
+Trial: 8         Steps took was 948.
+Average step to 2048 was 950.
+Trial: 9         Steps took was 957.
+Average step to 2048 was 951.
+
+Average step to 2048 was 951.
+merge weight: 850         Trial: 0         Steps took was 944.
+Average step to 2048 was 944.
+Trial: 1         Steps took was 956.
+Average step to 2048 was 950.
+Trial: 2         Steps took was 943.
+Average step to 2048 was 947.
+Trial: 3         Steps took was 931.
+Average step to 2048 was 943.
+Trial: 4         Steps took was 955.
+Average step to 2048 was 945.
+Trial: 5         Steps took was 1012.
+Average step to 2048 was 956.
+Trial: 6         Steps took was 978.
+Average step to 2048 was 959.
+Trial: 7         Steps took was 952.
+Average step to 2048 was 958.
+Trial: 8         Steps took was 973.
+Average step to 2048 was 960.
+Trial: 9         Steps took was 956.
+Average step to 2048 was 960.
+
+Average step to 2048 was 960.
+merge weight: 880         Trial: 0         Steps took was 958.
+Average step to 2048 was 958.
+Trial: 1         Steps took was 953.
+Average step to 2048 was 955.
+Trial: 2         Steps took was 952.
+Average step to 2048 was 954.
+Trial: 3         Steps took was 972.
+Average step to 2048 was 958.
+Trial: 4         Steps took was 951.
+Average step to 2048 was 957.
+Trial: 5         Steps took was 947.
+Average step to 2048 was 955.
+Trial: 6         Steps took was 957.
+Average step to 2048 was 955.
+Trial: 7         Steps took was 945.
+Average step to 2048 was 954.
+Trial: 8         Steps took was 940.
+Average step to 2048 was 952.
+Trial: 9         Steps took was 954.
+Average step to 2048 was 952.
+
+Average step to 2048 was 952.
+merge weight: 910         Trial: 0         Steps took was 946.
+Average step to 2048 was 946.
+Trial: 1         Steps took was 955.
+Average step to 2048 was 950.
+Trial: 2         Steps took was 949.
+Average step to 2048 was 950.
+Trial: 3         Steps took was 954.
+Average step to 2048 was 951.
+Trial: 4         Steps took was 954.
+Average step to 2048 was 951.
+Trial: 5         Steps took was 949.
+Average step to 2048 was 951.
+Trial: 6         Steps took was 949.
+Average step to 2048 was 950.
+Trial: 7         Steps took was 966.
+Average step to 2048 was 952.
+Trial: 8         Steps took was 944.
+Average step to 2048 was 951.
+Trial: 9         Steps took was 969.
+Average step to 2048 was 953.
+
+Average step to 2048 was 953.
+merge weight: 940         Trial: 0         Steps took was 1001.
+Average step to 2048 was 1001.
+Trial: 1         Steps took was 949.
+Average step to 2048 was 975.
+Trial: 2         Steps took was 940.
+Average step to 2048 was 963.
+Trial: 3         Steps took was 941.
+Average step to 2048 was 957.
+Trial: 4         Steps took was 951.
+Average step to 2048 was 956.
+Trial: 5         Steps took was 970.
+Average step to 2048 was 958.
+Trial: 6         Steps took was 926.
+Average step to 2048 was 954.
+Trial: 7         Steps took was 954.
+Average step to 2048 was 954.
+Trial: 8         Steps took was 955.
+Average step to 2048 was 954.
+Trial: 9         Steps took was 949.
+Average step to 2048 was 953.
+
+Average step to 2048 was 953.
+merge weight: 970         Trial: 0         Steps took was 953.
+Average step to 2048 was 953.
+Trial: 1         Steps took was 944.
+Average step to 2048 was 948.
+Trial: 2         Steps took was 958.
+Average step to 2048 was 951.
+Trial: 3         Steps took was 933.
+Average step to 2048 was 947.
+Trial: 4         Steps took was 954.
+Average step to 2048 was 948.
+Trial: 5         Steps took was 956.
+Average step to 2048 was 949.
+Trial: 6         Steps took was 960.
+Average step to 2048 was 951.
+Trial: 7         Steps took was 959.
+Average step to 2048 was 952.
+Trial: 8         Steps took was 941.
+Average step to 2048 was 950.
+Trial: 9         Steps took was 937.
+Average step to 2048 was 949.
+
+Average step to 2048 was 949.
+merge weight: 1000         

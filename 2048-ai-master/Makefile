@@ -8,10 +8,10 @@ CPPFLAGS =
 CXX = g++
 CXXLD = $(CXX)
 CXXCPP = g++ -E
-CXXFLAGS = -g -O2 -std=gnu++11 -O3 -Wall -Wextra -fPIC
+CXXFLAGS = -g -O2 -O3 -Wall -Wextra -fPIC
 LDFLAGS = 
 LIBS = 
-MKDIR_P = ./install-sh -c -d
+MKDIR_P = /usr/bin/mkdir -p
 
 EXEEXT = 
 OBJEXT = o
