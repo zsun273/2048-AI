@@ -36,7 +36,7 @@ class Game(object):
         self.states = {}
         self.width = 4
         self.height = 4
-
+        self.th = 128
         self.init_board(state)
         # if state is None:
         #     self._state = np.zeros((4, 4), dtype=np.int)
@@ -66,7 +66,7 @@ class Game(object):
             return end: if end
                     winning: win or lose
         """
-        if self.max_tile() >= 256:  # stop at winning state
+        if self.max_tile() >= self.th:  # stop at winning state
             return True, 1
 
         for action in range(4):
@@ -256,7 +256,7 @@ class Game(object):
         #                     self.last_move % self.height] = 1.0
         # if len(self.states) % 2 == 0:
         #     square_state[3][:, :] = 1.0  # indicate the colour to play
-        return square_state
+        return np.copy(square_state)
 
 class Play:
     """2048 game server"""

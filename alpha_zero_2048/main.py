@@ -9,6 +9,17 @@ from player import MCTSPlayer
 from policy_value_net_pytorch import PolicyValueNet  # Pytorch
 # from policy_value_net_tensorflow import PolicyValueNet # Tensorflow
 # from policy_value_net_keras import PolicyValueNet # Keras
+import torch
+import os
+
+def seed_everything(seed: int):
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = True
 
 
 class TrainPipeline():
@@ -26,15 +37,14 @@ class TrainPipeline():
         self.n_playout = 400  # num of simulations for each move
         self.c_puct = 5
         self.buffer_size = 10000
-        #self.batch_size = 512  # mini-batch size for training
-        self.batch_size = 128  # mini-batch size for training
+        self.batch_size = 512  # mini-batch size for training
         self.data_buffer = deque(maxlen=self.buffer_size)
         self.play_batch_size = 1
         self.epochs = 5  # num of train_steps for each update
         self.kl_targ = 0.02
         self.check_freq = 50
         #self.game_batch_num = 1500
-        self.game_batch_num = 30
+        self.game_batch_num = 50
         self.best_win_ratio = 0.0
         # num of simulations used for the pure mcts, which is used as
         # the opponent to evaluate the trained policy
@@ -63,6 +73,7 @@ class TrainPipeline():
             # augment the data
             # play_data = self.get_equi_data(play_data)
             self.data_buffer.extend(play_data)
+            print(self.data_buffer[-10])
 
     def policy_update(self):
         """update the policy-value net"""
@@ -142,6 +153,9 @@ class TrainPipeline():
                         i+1, self.episode_len))
                 if len(self.data_buffer) > self.batch_size:
                     loss, entropy = self.policy_update()
+                if i == 25:
+                    self.game.board.th *= 2
+                    self.data_buffer = deque(maxlen=self.buffer_size)
                 # check the performance of the current model,
                 # and save the model params
 
@@ -166,6 +180,7 @@ class TrainPipeline():
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
+    seed_everything(42)
     training_pipeline = TrainPipeline()
     training_pipeline.run()
 

@@ -198,7 +198,7 @@ class MCTS(object):
             node.expand(action_probs)
         else:
             # for end state，return the "true" leaf_value
-            leaf_value = 0.0 if winning == -1 else 1.0
+            leaf_value = 1.0 if winning == 1 else -1.0
 
         # Update value and visit count of nodes in this traversal.
         node.update_recursive(-leaf_value)
