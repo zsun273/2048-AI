@@ -156,6 +156,9 @@ class TrainPipeline():
                 if i == 25:
                     self.game.board.th *= 2
                     self.data_buffer = deque(maxlen=self.buffer_size)
+                if i == 50:
+                    self.game.board.th *= 2
+                    self.data_buffer = deque(maxlen=self.buffer_size)
                 # check the performance of the current model,
                 # and save the model params
 

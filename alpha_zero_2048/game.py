@@ -202,9 +202,9 @@ class Game(object):
         return vec
 
     def to_string(self):
-        vec = ["0"]*256
+        vec = ["0"]*16
         for i, num in enumerate(np.array(self._state).flatten()):
-            vec[i * 16 + num - 1] = "1"
+            vec[i] = str(num)
         return "".join(vec)
 
     def action_available(self):
