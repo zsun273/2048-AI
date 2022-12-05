@@ -46,7 +46,7 @@ class RandomStateNode(object):
         """
         # If it is not root, this node's parent should be updated first.
         if self._parent:
-            self._parent.update_recursive(-leaf_value)
+            self._parent.update_recursive(leaf_value)
         self.update(leaf_value)
 
     def get_value(self, c_puct):
@@ -118,7 +118,7 @@ class TreeNode(object):
         """
         # If it is not root, this node's parent should be updated first.
         if self._parent:
-            self._parent.update_recursive(-leaf_value)
+            self._parent.update_recursive(leaf_value)
         self.update(leaf_value)
 
     def get_value(self, c_puct):
@@ -180,8 +180,6 @@ class MCTS(object):
             state.do_move(action)
 
             state_string = state.add_random_tile()
-            print(state_string)
-            print(state._state)
             node = rds_node.get_child(state_string)
             if not node:
                 rds_node.add_node(state_string, 1)
@@ -219,7 +217,6 @@ class MCTS(object):
         root_node = self._root.get_child(state.to_string())
         act_visits = [(act, node._n_visits)
                       for act, node in root_node._children.items()]
-        print(act_visits)
         acts, visits = zip(*act_visits)
         act_probs = softmax(1.0/temp * np.log(np.array(visits) + 1e-10))
 
