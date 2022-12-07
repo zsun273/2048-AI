@@ -289,7 +289,7 @@ class Play:
                 if winner == 1:
                     winners_z = np.ones(len(states), dtype=float)
                 else:
-                    winners_z = np.full(100, -1.0)
+                    winners_z = np.full(len(states), -1.0)
                 # reset MCTS root node
                 player.reset_player()
                 if is_shown:
